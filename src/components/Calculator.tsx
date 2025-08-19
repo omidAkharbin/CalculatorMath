@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {evaluate} from "mathjs";
 import "./Calculator.css";
 
@@ -9,8 +9,7 @@ const Calculator = () => {
     return ["+", "-", "*", "/"].includes(char);
   };
 
-  const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
-    const input = e.currentTarget.value;
+  const handleInput = (input: string) => {
     const lastChar = value.slice(-1);
 
     if ((value === "0" && input === "0") || (value === "00" && input === "00"))
@@ -37,6 +36,11 @@ const Calculator = () => {
     setValue(value + input);
   };
 
+  // handleClick uses input handler
+  const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    handleInput(e.currentTarget.value);
+  };
+
   const handleClear = () => setValue("0");
 
   const handleDelete = () => {
@@ -53,6 +57,8 @@ const Calculator = () => {
         setValue("0");
         return;
       }
+      // Prevent evaluation if the last character is an operator
+      if (isOperator(value.slice(-1))) return;
 
       const result = evaluate(value);
       setValue(result.toString());
@@ -60,6 +66,33 @@ const Calculator = () => {
       setValue("Error");
     }
   };
+
+  // 2. Add useEffect to listen for keyboard events
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      event.preventDefault();
+      const {key} = event;
+
+      if (/\d/.test(key) || key === ".") {
+        handleInput(key);
+      } else if (isOperator(key)) {
+        handleInput(key);
+      } else if (key === "Enter" || key === "=") {
+        handleCalculate();
+      } else if (key === "Backspace") {
+        handleDelete();
+      } else if (key === "Escape") {
+        handleClear();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup function to remove the listener
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [value]);
 
   return (
     <div className="container">

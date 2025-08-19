@@ -3,6 +3,7 @@
 This project is a calculator with Proper calculation accuracy
 
 ![Project Screenshot](./src/assets/CalculatorLanding.png)
+> 
 ✨ **Live Demo:** [https://omidakharbin.github.io/CalculatorMath/](https://omidakharbin.github.io/CalculatorMath)
 
 ## 🚀 Built With
